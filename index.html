@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NovaCore Suite | L'intelligence artificielle au service de l’humain</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#07090e',
+                            800: '#0d111a',
+                            700: '#151c2c',
+                            600: '#1e293b',
+                        },
+                        neon: {
+                            blue: '#3b82f6',
+                            cyan: '#06b6d4',
+                            violet: '#8b5cf6',
+                            purple: '#a855f7'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Roboto', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'glow-blue': '0 0 25px -5px rgba(59, 130, 246, 0.4)',
+                        'glow-violet': '0 0 25px -5px rgba(139, 92, 246, 0.4)',
+                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts: Roboto -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #07090e;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0d111a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3b82f6;
+        }
+        .glass-card {
+            background: rgba(13, 17, 26, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card-hover:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 0 30px -5px rgba(59, 130, 246, 0.25);
+        }
+        .hero-gradient {
+            background: radial-gradient(circle at 50% 20%, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.1), transparent 70%);
+        }
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+        }
+        .animate-pulse-glow {
+            animation: pulseGlow 4s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-dark-900 text-slate-100 min-h-screen flex flex-col selection:bg-neon-blue selection:text-white">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-3 pointer-events-none"></div>
+
+    <!-- Login / Mon Compte Modal -->
+    <div id="login-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-card max-w-md w-full rounded-3xl overflow-hidden border border-white/20 shadow-2xl relative">
+            <div class="flex items-center justify-between px-6 py-5 border-b border-white/10 bg-dark-800/50">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-neon-blue to-neon-violet flex items-center justify-center text-white">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-base text-white" id="login-modal-title">Portail Mon Compte</h3>
+                        <p class="text-xs text-neon-cyan" id="login-modal-subtitle">Accédez à votre espace sécurisé NovaCore</p>
+                    </div>
+                </div>
+                <button onclick="closeLoginModal()" class="text-slate-400 hover:text-white p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div id="auth-form-container" class="p-6 sm:p-8 space-y-5">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Adresse Email</label>
+                        <input type="email" id="auth-email" placeholder="votre.email@domaine.com" class="w-full bg-dark-900 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-neon-blue transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Mot de passe ou Clé de Licence</label>
+                        <input type="password" id="auth-password" placeholder="••••••••••••" class="w-full bg-dark-900 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-neon-blue transition-colors">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between text-xs text-slate-400">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" class="rounded bg-dark-900 border-white/20 text-neon-blue focus:ring-0">
+                        <span>Se souvenir de moi</span>
+                    </label>
+                    <a href="#" onclick="showToast('Instructions de récupération envoyées à votre email.', 'info'); return false;" class="text-neon-blue hover:underline">Mot de passe oublié ?</a>
+                </div>
+
+                <button onclick="handleLoginSubmit()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-neon-blue to-neon-violet text-white font-bold text-sm shadow-lg shadow-neon-blue/30 hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span>Se connecter à mon compte</span>
+                </button>
+
+                <div class="text-center pt-2 border-t border-white/10">
+                    <p class="text-xs text-slate-400">Pas encore de licence ? <button onclick="closeLoginModal(); openCheckoutModal();" class="text-neon-cyan font-bold hover:underline">Obtenir NovaCore Pro</button></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Modal Player -->
+    <div id="video-modal" class="fixed inset-0 z-50 hidden bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-card max-w-4xl w-full rounded-2xl overflow-hidden border border-white/25 shadow-2xl relative">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-white/10">
+                <div class="flex items-center space-x-2">
+                    <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                    <span id="modal-video-title" class="font-bold text-sm text-white">Démonstration Live</span>
+                </div>
+                <button onclick="closeVideoModal()" class="text-slate-400 hover:text-white text-lg p-2"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="relative aspect-video bg-black flex items-center justify-center">
+                <video id="active-video-element" class="w-full h-full object-contain" controls autoplay preload="auto">
+                    <source src="" type="video/mp4" id="video-source">
+                    Votre navigateur ne supporte pas la lecture vidéo.
+                </video>
+            </div>
+            <div class="p-4 bg-dark-800 text-xs text-slate-400 flex items-center justify-between">
+                <span>NovaCore Streaming Engine v4.8</span>
+                <span class="text-neon-cyan">HD 1080p • Chiffré de bout en bout</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout / Payment Modal -->
+    <div id="checkout-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+        <div class="glass-card max-w-xl w-full rounded-3xl overflow-hidden border border-white/20 shadow-2xl relative my-auto max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-dark-800/90 flex-shrink-0 z-10">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-neon-blue to-neon-violet flex items-center justify-center text-white text-xs">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm text-white">Tunnel de Paiement Sécurisé</h3>
+                        <p class="text-[11px] text-neon-cyan">Panier & Conversion Crypto en direct</p>
+                    </div>
+                </div>
+                <button onclick="closeCheckoutModal()" class="text-slate-400 hover:text-white p-2 text-xl transition-colors"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="p-5 sm:p-6 space-y-4 overflow-y-auto flex-grow">
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                        <span>Articles dans le panier (<span id="cart-count">0</span>)</span>
+                        <button onclick="clearCart()" class="text-[10px] text-rose-400 hover:underline">Vider</button>
+                    </div>
+                    <div id="cart-items-container" class="space-y-2 max-h-32 overflow-y-auto pr-1">
+                        <p class="text-xs text-slate-500 italic text-center py-2">Votre panier est vide. Sélectionnez une version dans l'onglet Tarifs.</p>
+                    </div>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-dark-800/80 border border-white/10 flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] text-slate-400 block font-medium">Total de la commande</span>
+                        <span class="font-bold text-xs text-white">Licences & Modules NovaCore Suite</span>
+                    </div>
+                    <div class="text-right">
+                        <span id="cart-total-price" class="text-base font-black text-neon-blue">0,00 €</span>
+                        <span class="text-[10px] text-slate-400 block">/ mois</span>
+                    </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-300">Email pour la livraison de la licence *</label>
+                    <input type="email" id="license-email" placeholder="votre.email@domaine.com" class="w-full bg-dark-900 border border-white/15 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-neon-blue transition-colors">
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-300">Code Promo (Optionnel)</label>
+                    <div class="flex space-x-2">
+                        <input type="text" id="promo-code-input" placeholder="ex: NOVA2026" class="flex-grow bg-dark-900 border border-white/15 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-neon-blue">
+                        <button onclick="applyPromoCode()" class="px-4 py-2 rounded-xl bg-dark-800 hover:bg-white/10 border border-white/15 text-[11px] font-bold transition-all text-slate-200">Appliquer</button>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-300">Choisissez le mode de paiement</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <button onclick="selectPaymentMethod('btc')" id="pay-btn-btc" class="pay-method-btn p-2.5 rounded-xl border border-neon-blue bg-neon-blue/10 text-center transition-all">
+                            <i class="fa-brands fa-bitcoin text-amber-400 text-base mb-1 block"></i>
+                            <span class="text-[10px] font-bold text-white">BTC</span>
+                        </button>
+                        <button onclick="selectPaymentMethod('eth')" id="pay-btn-eth" class="pay-method-btn p-2.5 rounded-xl border border-white/10 bg-dark-800 text-center transition-all hover:border-white/30">
+                            <i class="fa-brands fa-ethereum text-purple-400 text-base mb-1 block"></i>
+                            <span class="text-[10px] font-bold text-slate-300">ETH</span>
+                        </button>
+                        <button onclick="selectPaymentMethod('sol')" id="pay-btn-sol" class="pay-method-btn p-2.5 rounded-xl border border-white/10 bg-dark-800 text-center transition-all hover:border-white/30">
+                            <i class="fa-solid fa-bolt text-cyan-400 text-base mb-1 block"></i>
+                            <span class="text-[10px] font-bold text-slate-300">SOL</span>
+                        </button>
+                        <button onclick="selectPaymentMethod('xmr')" id="pay-btn-xmr" class="pay-method-btn p-2.5 rounded-xl border border-white/10 bg-dark-800 text-center transition-all hover:border-white/30">
+                            <i class="fa-solid fa-shield-cat text-orange-400 text-base mb-1 block"></i>
+                            <span class="text-[10px] font-bold text-slate-300">XMR</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Boîte dynamique de paiement Crypto -->
+                <div id="payment-details-box" class="p-3.5 rounded-xl bg-dark-900 border border-white/15 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] uppercase tracking-wider text-neon-cyan font-bold" id="crypto-label">Adresse de Paiement Bitcoin (BTC)</span>
+                        <span class="text-[10px] text-slate-400 font-mono">Montant exact: <strong id="crypto-converted-amount" class="text-white">0.00 BTC</strong></span>
+                    </div>
+                    <div class="flex items-center space-x-2" id="payment-input-container">
+                        <input type="text" id="crypto-address-field" readonly value="bc1qumqhn7vd0ycvyqpm4h5254hshffsvlwlzun0pl" class="w-full bg-dark-800 border border-white/10 rounded-xl px-3 py-2 text-[11px] font-mono text-slate-200 focus:outline-none">
+                        <button onclick="copyCryptoAddress()" id="payment-action-btn" class="px-3 py-2 bg-neon-blue text-white rounded-xl text-[10px] font-bold hover:bg-blue-600 transition-colors flex-shrink-0">
+                            <i class="fa-solid fa-copy mr-1"></i> Copier
+                        </button>
+                    </div>
+                </div>
+
+                <button onclick="validateOrder()" class="w-full py-3 rounded-xl bg-gradient-to-r from-neon-blue to-neon-violet text-white font-bold text-xs shadow-lg shadow-neon-blue/30 hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                    <span>J'ai effectué le paiement / Valider la commande</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-40 glass-card border-b border-white/10 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-neon-blue to-neon-violet flex items-center justify-center shadow-lg shadow-neon-blue/30">
+                    <i class="fa-solid fa-shield-halved text-white text-lg"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-black tracking-wider bg-gradient-to-r from-white via-slate-200 to-neon-blue bg-clip-text text-transparent">NovaCore</span>
+                    <span class="text-xs uppercase tracking-widest text-neon-violet block font-bold">Suite AI Powered By Mythos(Claude)</span>
+                </div>
+            </div>
+
+            <nav class="hidden md:flex items-center space-x-1 lg:space-x-2 bg-dark-800/80 p-1.5 rounded-full border border-white/10 shadow-inner">
+                <button onclick="switchTab('home')" id="nav-btn-home" class="nav-btn px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 text-white bg-neon-blue/20 shadow-sm border border-neon-blue/30">Accueil</button>
+                <button onclick="switchTab('features')" id="nav-btn-features" class="nav-btn px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5">Fonctionnalités</button>
+                <button onclick="switchTab('pricing')" id="nav-btn-pricing" class="nav-btn px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5">Tarifs</button>
+                <button onclick="switchTab('testimonials')" id="nav-btn-testimonials" class="nav-btn px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5">Avis</button>
+                <button onclick="switchTab('faq')" id="nav-btn-faq" class="nav-btn px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5">Support & FAQ</button>
+            </nav>
+
+            <div class="flex items-center space-x-3">
+                <button onclick="openLoginModal()" id="top-login-btn" class="px-4 py-2.5 rounded-xl glass-card hover:bg-white/10 text-xs font-bold text-slate-200 border border-white/15 transition-all flex items-center space-x-2">
+                    <i class="fa-solid fa-user-circle text-neon-cyan"></i>
+                    <span id="top-login-text">Login / Mon Compte</span>
+                </button>
+                <button onclick="openCheckoutModal()" class="relative group overflow-hidden rounded-xl p-[1px] font-semibold text-sm hidden sm:block">
+                    <span class="absolute inset-0 bg-gradient-to-r from-neon-blue to-neon-violet transition-all duration-300 group-hover:opacity-90"></span>
+                    <span class="relative px-5 py-2.5 rounded-[11px] bg-dark-900 flex items-center space-x-2 transition-colors duration-300 group-hover:bg-opacity-0 text-white">
+                        <i class="fa-solid fa-cart-shopping text-neon-cyan"></i>
+                        <span>Panier (<span id="cart-badge">0</span>)</span>
+                    </span>
+                </button>
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2.5 rounded-xl bg-dark-800 border border-white/10 text-slate-300 hover:text-white">
+                    <i class="fa-solid fa-bars text-lg" id="mobile-menu-icon"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden glass-card border-t border-white/10 px-4 pt-2 pb-6 space-y-2">
+            <button onclick="switchTab('home'); toggleMobileMenu();" class="block w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-slate-300 hover:bg-white/5">Accueil</button>
+            <button onclick="switchTab('features'); toggleMobileMenu();" class="block w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-slate-300 hover:bg-white/5">Fonctionnalités</button>
+            <button onclick="switchTab('pricing'); toggleMobileMenu();" class="block w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-slate-300 hover:bg-white/5">Tarifs</button>
+            <button onclick="switchTab('testimonials'); toggleMobileMenu();" class="block w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-slate-300 hover:bg-white/5">Avis</button>
+            <button onclick="switchTab('faq'); toggleMobileMenu();" class="block w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-slate-300 hover:bg-white/5">Support & FAQ</button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow hero-gradient relative">
+        <div class="absolute inset-0 pointer-events-none overflow-hidden">
+            <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-neon-blue/10 rounded-full blur-[120px] animate-pulse-glow"></div>
+            <div class="absolute top-2/3 left-1/4 w-[400px] h-[400px] bg-neon-violet/10 rounded-full blur-[100px]"></div>
+        </div>
+
+        <!-- VIEW 1: HOME -->
+        <div id="view-home" class="view-section max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
+            
+            <div class="mb-16 glass-card rounded-3xl p-6 sm:p-8 border border-neon-blue/40 shadow-glow-blue relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-96 h-96 bg-neon-cyan/10 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    <div class="lg:col-span-5 space-y-6">
+                        <div class="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-neon-blue/10 border border-neon-blue/30 text-xs font-semibold text-neon-cyan">
+                            <span class="w-2 h-2 rounded-full bg-neon-cyan animate-ping"></span>
+                            <span>Découvrez la Nouvelle Interface Web</span>
+                        </div>
+                        <h2 class="text-2xl sm:text-4xl font-black tracking-tight text-white leading-snug">
+                            NovaCore Web Dashboard <span class="bg-gradient-to-r from-neon-cyan to-neon-blue bg-clip-text text-transparent">v4.8</span>
+                        </h2>
+                        <p class="text-slate-300 text-sm leading-relaxed font-light">
+                            Explorez notre nouvelle interface web centralisée. Pilotez vos audits de sécurité, suivez les flux de données et interagissez avec l'agent IA depuis un panneau de contrôle ergonomique et ultra-rapide.
+                        </p>
+                        <div class="flex flex-wrap gap-3 pt-2">
+                            <button onclick="switchTab('features')" class="px-5 py-3 rounded-xl bg-neon-blue text-white font-bold text-xs shadow-lg shadow-neon-blue/30 hover:bg-blue-600 transition-all flex items-center space-x-2">
+                                <i class="fa-solid fa-terminal"></i>
+                                <span>Tester la console</span>
+                            </button>
+                            <button onclick="openCheckoutModal()" class="px-5 py-3 rounded-xl glass-card hover:bg-white/10 text-white font-bold text-xs border border-white/15 transition-all">
+                                Obtenir l'accès
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="lg:col-span-7">
+                        <div class="rounded-2xl overflow-hidden border border-white/15 shadow-2xl bg-dark-900 group relative">
+                            <div class="px-4 py-3 bg-dark-800/90 border-b border-white/10 flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                                    <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                                    <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                                </div>
+                                <span class="text-[11px] font-mono text-slate-400">https://app.novacore.io/dashboard</span>
+                                <div class="w-4"></div>
+                            </div>
+                            <div class="relative overflow-hidden aspect-video bg-dark-900 flex items-center justify-center">
+                                <img src="captureweb.png" alt="NovaCore Web Dashboard" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                                <div class="absolute inset-0 bg-gradient-to-t from-dark-900/60 via-transparent to-transparent pointer-events-none"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center max-w-4xl mx-auto space-y-8 py-12">
+                <div class="inline-flex items-center space-x-2 px-4 py-2 rounded-full glass-card border border-neon-blue/30 text-xs font-semibold uppercase tracking-wider text-neon-cyan animate-bounce">
+                    <span class="w-2 h-2 rounded-full bg-neon-cyan animate-ping"></span>
+                    <span>Mise à jour Zero-Day quotidienne active • V 4.8</span>
+                </div>
+                <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-none">
+                    L'intelligence artificielle <br>
+                    <span class="bg-gradient-to-r from-neon-cyan via-neon-blue to-neon-violet bg-clip-text text-transparent">au service de l’humain.</span>
+                </h1>
+                <p class="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto font-light leading-relaxed">
+                    Donnez accès aux outils cyber les plus puissants grâce à notre agent IA conversationnel. Gestion automatisée des failles zero-day, chemin d'attaque automatisé.
+                </p>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                    <button onclick="addToCart('NovaCore Pro License', 219); openCheckoutModal();" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-neon-blue to-neon-violet text-white font-bold shadow-lg shadow-neon-blue/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center space-x-3">
+                        <i class="fa-solid fa-rocket"></i>
+                        <span>Démarrer l'essai (219€/mois)</span>
+                    </button>
+                    <button onclick="switchTab('features')" class="w-full sm:w-auto px-8 py-4 rounded-xl glass-card text-slate-200 font-bold hover:bg-white/5 transition-all flex items-center justify-center space-x-2 border border-white/10">
+                        <span>Explorer les fonctions</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Client Proof / Social Proof -->
+            <div class="py-12 border-y border-white/10 my-12">
+                <p class="text-center text-xs uppercase tracking-widest text-slate-400 mb-8 font-semibold">Ils sécurisent leurs infrastructures critiques avec NovaCore</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 items-center opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
+                    <div class="glass-card p-4 rounded-xl text-center font-bold tracking-wider text-slate-300 flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-shield text-neon-blue"></i> <span>APEX_SEC</span>
+                    </div>
+                    <div class="glass-card p-4 rounded-xl text-center font-bold tracking-wider text-slate-300 flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-cube text-neon-violet"></i> <span>NEXUS_INFRA</span>
+                    </div>
+                    <div class="glass-card p-4 rounded-xl text-center font-bold tracking-wider text-slate-300 flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-network-wired text-neon-cyan"></i> <span>CYBER_WAVE</span>
+                    </div>
+                    <div class="glass-card p-4 rounded-xl text-center font-bold tracking-wider text-slate-300 flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-terminal text-emerald-400"></i> <span>OMNI_DEFEND</span>
+                    </div>
+                    <div class="glass-card p-4 rounded-xl text-center font-bold tracking-wider text-slate-300 flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-atom text-amber-400"></i> <span>QUANTUM_OPS</span>
+                    </div>
+                    <div class="glass-card p-4 rounded-xl text-center font-bold tracking-wider text-slate-300 flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-microchip text-rose-400"></i> <span>TITAN_SEC</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Features Grid Preview -->
+            <div class="py-12">
+                <div class="text-center max-w-2xl mx-auto mb-16">
+                    <h2 class="text-3xl font-bold tracking-tight">Capacités de pointe en un clin d'œil</h2>
+                    <p class="text-slate-400 mt-2">Tous les outils les plus connus de la cyber en face de vous. Le choix de logique est automatiquement géré par notre agent IA. Compréhension accrue et méthodologique au bout de vos doigts.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="glass-card glass-card-hover p-8 rounded-2xl transition-all space-y-4">
+                        <div class="w-12 h-12 rounded-xl bg-neon-blue/20 text-neon-blue flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-bolt-lightning"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Zero-Day AI Shield</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">Détection et mitigation automatique de failles inconnues avant leur exploitation en milieu de production.</p>
+                        <button onclick="switchTab('features')" class="text-xs font-bold text-neon-blue flex items-center space-x-1 hover:underline"><span>En savoir plus</span> <i class="fa-solid fa-chevron-right text-[10px]"></i></button>
+                    </div>
+                    <div class="glass-card glass-card-hover p-8 rounded-2xl transition-all space-y-4">
+                        <div class="w-12 h-12 rounded-xl bg-neon-violet/20 text-neon-violet flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Prompt Agent Novice</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">Interagissez en langage naturel. L'agent IA traduit vos consignes en requêtes de sécurité et audits avancés.</p>
+                        <button onclick="switchTab('features')" class="text-xs font-bold text-neon-violet flex items-center space-x-1 hover:underline"><span>En savoir plus</span> <i class="fa-solid fa-chevron-right text-[10px]"></i></button>
+                    </div>
+                    <div class="glass-card glass-card-hover p-8 rounded-2xl transition-all space-y-4">
+                        <div class="w-12 h-12 rounded-xl bg-neon-cyan/20 text-neon-cyan flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-arrows-rotate"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Patchs Quotidiens</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">Mises à jour automatiques quotidiennes intégrant les dernières signatures de vulnérabilités mondiales.</p>
+                        <button onclick="switchTab('features')" class="text-xs font-bold text-neon-cyan flex items-center space-x-1 hover:underline"><span>En savoir plus</span> <i class="fa-solid fa-chevron-right text-[10px]"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Gallery Section (video1.mp4 to video4.mp4) -->
+            <div class="py-16">
+                <div class="flex flex-col md:flex-row items-start md:items-end justify-between mb-12">
+                    <div>
+                        <span class="text-xs uppercase tracking-widest text-neon-cyan font-bold block mb-2">Démonstrations Officielles</span>
+                        <h2 class="text-3xl font-bold tracking-tight">Cas d'Usage & Aperçus Vidéo</h2>
+                    </div>
+                    <p class="text-slate-400 text-sm max-w-md mt-4 md:mt-0">Cliquez sur un aperçu pour lancer la vidéo en plein écran avec le son.</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div onclick="openVideoModal('video1.mp4', 'Démonstration Vidéo 1 - Agent IA')" class="glass-card glass-card-hover rounded-xl overflow-hidden cursor-pointer group">
+                        <div class="relative h-44 bg-slate-900 flex items-center justify-center overflow-hidden">
+                            <video src="video1.mp4" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity pointer-events-none" autoplay muted loop playsinline></video>
+                            <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-transparent opacity-60"></div>
+                            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
+                                <div class="w-12 h-12 rounded-full bg-neon-blue flex items-center justify-center text-white shadow-lg">
+                                    <i class="fa-solid fa-play ml-0.5"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h4 class="font-bold text-sm text-white group-hover:text-neon-blue transition-colors">Module Vidéo 1</h4>
+                            <p class="text-xs text-slate-400 mt-1">Agent IA & Prompts Intelligents</p>
+                        </div>
+                    </div>
+
+                    <div onclick="openVideoModal('video2.mp4', 'Démonstration Vidéo 2 - Mitigation Zero-Day')" class="glass-card glass-card-hover rounded-xl overflow-hidden cursor-pointer group">
+                        <div class="relative h-44 bg-slate-900 flex items-center justify-center overflow-hidden">
+                            <video src="video2.mp4" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity pointer-events-none" autoplay muted loop playsinline></video>
+                            <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-transparent opacity-60"></div>
+                            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
+                                <div class="w-12 h-12 rounded-full bg-neon-violet flex items-center justify-center text-white shadow-lg">
+                                    <i class="fa-solid fa-play ml-0.5"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h4 class="font-bold text-sm text-white group-hover:text-neon-violet transition-colors">Module Vidéo 2</h4>
+                            <p class="text-xs text-slate-400 mt-1">Mitigation Zero-Day en Direct</p>
+                        </div>
+                    </div>
+
+                    <div onclick="openVideoModal('video3.mp4', 'Démonstration Vidéo 3 - Patchs Quotidiens')" class="glass-card glass-card-hover rounded-xl overflow-hidden cursor-pointer group">
+                        <div class="relative h-44 bg-slate-900 flex items-center justify-center overflow-hidden">
+                            <video src="video3.mp4" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity pointer-events-none" autoplay muted loop playsinline></video>
+                            <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-transparent opacity-60"></div>
+                            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
+                                <div class="w-12 h-12 rounded-full bg-neon-cyan flex items-center justify-center text-white shadow-lg">
+                                    <i class="fa-solid fa-play ml-0.5"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h4 class="font-bold text-sm text-white group-hover:text-neon-cyan transition-colors">Module Vidéo 3</h4>
+                            <p class="text-xs text-slate-400 mt-1">Mises à jour et Patchs Quotidiens</p>
+                        </div>
+                    </div>
+
+                    <div onclick="openVideoModal('video4.mp4', 'Démonstration Vidéo 4 - Géolocalisation IMEI')" class="glass-card glass-card-hover rounded-xl overflow-hidden cursor-pointer group">
+                        <div class="relative h-44 bg-slate-900 flex items-center justify-center overflow-hidden">
+                            <video src="video4.mp4" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity pointer-events-none" autoplay muted loop playsinline></video>
+                            <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-transparent opacity-60"></div>
+                            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
+                                <div class="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white shadow-lg">
+                                    <i class="fa-solid fa-play ml-0.5"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h4 class="font-bold text-sm text-white group-hover:text-blue-400 transition-colors">Module Vidéo 4</h4>
+                            <p class="text-xs text-slate-400 mt-1">Géolocalisation IMEI & Appareil</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: FEATURES -->
+        <div id="view-features" class="view-section max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10 hidden">
+            <div class="text-center max-w-3xl mx-auto mb-12 space-y-4">
+                <span class="text-xs uppercase tracking-widest text-neon-violet font-bold block">Console Agent IA NovaCore</span>
+                <h2 class="text-3xl sm:text-5xl font-black tracking-tight">Modules Avancés & Assistant Conversationnel</h2>
+                <p class="text-slate-400">Sélectionnez un module de recherche/investigation pour visualiser les flux de données et l'état des analyses de sécurité en direct.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                <div class="glass-card rounded-2xl p-6 space-y-4 lg:col-span-1">
+                    <h3 class="font-bold text-base text-white flex items-center space-x-2 pb-3 border-b border-white/10">
+                        <i class="fa-solid fa-cubes text-neon-blue"></i>
+                        <span>Modules Intégrés (V 4.8)</span>
+                    </h3>
+                    
+                    <div class="space-y-2.5">
+                        <button onclick="selectModule('logs')" id="module-btn-logs" class="module-btn w-full text-left p-3.5 rounded-xl border border-neon-blue bg-neon-blue/10 transition-all flex items-center justify-between group">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-lg bg-neon-blue/20 text-neon-blue flex items-center justify-center text-sm">
+                                    <i class="fa-solid fa-file-waveform"></i>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-white block">Récupération Log Apps</span>
+                                    <span class="text-[10px] text-slate-400">Instantané & multi-sources</span>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-xs text-neon-blue"></i>
+                        </button>
+
+                        <button onclick="selectModule('chat')" id="module-btn-chat" class="module-btn w-full text-left p-3.5 rounded-xl border border-white/10 bg-dark-800 transition-all flex items-center justify-between group hover:border-white/30">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-lg bg-neon-violet/20 text-neon-violet flex items-center justify-center text-sm">
+                                    <i class="fa-solid fa-comments"></i>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-200 block">Accès Conversations</span>
+                                    <span class="text-[10px] text-slate-400">Sans restriction</span>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
+                        </button>
+
+                        <button onclick="selectModule('imei')" id="module-btn-imei" class="module-btn w-full text-left p-3.5 rounded-xl border border-white/10 bg-dark-800 transition-all flex items-center justify-between group hover:border-white/30">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-lg bg-neon-cyan/20 text-neon-cyan flex items-center justify-center text-sm">
+                                    <i class="fa-solid fa-location-crosshairs"></i>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-200 block">Localisation IMEI</span>
+                                    <span class="text-[10px] text-slate-400">Numéro IMEI & satellite</span>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
+                        </button>
+
+                        <button onclick="selectModule('remote')" id="module-btn-remote" class="module-btn w-full text-left p-3.5 rounded-xl border border-white/10 bg-dark-800 transition-all flex items-center justify-between group hover:border-white/30">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm">
+                                    <i class="fa-solid fa-mobile-screen-button"></i>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-200 block">Accès à Distance Appareil</span>
+                                    <span class="text-[10px] text-slate-400">Contrôle direct sécurisé</span>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
+                        </button>
+
+                        <button onclick="selectModule('social')" id="module-btn-social" class="module-btn w-full text-left p-3.5 rounded-xl border border-white/10 bg-dark-800 transition-all flex items-center justify-between group hover:border-white/30">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center text-sm">
+                                    <i class="fa-solid fa-share-nodes"></i>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-200 block">Insta, Snapchat, FB, iCloud</span>
+                                    <span class="text-[10px] text-slate-400">Passerelles d'extraction</span>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
+                        </button>
+
+                        <button onclick="selectModule('mirror')" id="module-btn-mirror" class="module-btn w-full text-left p-3.5 rounded-xl border border-white/10 bg-dark-800 transition-all flex items-center justify-between group hover:border-white/30">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm">
+                                    <i class="fa-solid fa-tv"></i>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-200 block">Screen Mirroring App</span>
+                                    <span class="text-[10px] text-slate-400">Apple & Android HD</span>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
+                        </button>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-dark-900 border border-white/10 text-xs text-slate-400 space-y-2">
+                        <div class="flex items-center justify-between font-bold text-white">
+                            <span>État Agent IA</span>
+                            <span class="text-emerald-400 flex items-center space-x-1"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> <span>En ligne</span></span>
+                        </div>
+                        <p>Modèle v4.8 optimisé pour l'assistance aux novices et experts en cybersécurité.</p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl overflow-hidden lg:col-span-2 flex flex-col h-[650px]">
+                    <div class="px-6 py-4 bg-dark-800/80 border-b border-white/10 flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-3 h-3 rounded-full bg-rose-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-amber-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                            <span class="text-xs font-mono text-slate-300 ml-2" id="console-active-title">Module: Récupération Log Apps Instantané</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="clearConsole()" class="px-3 py-1 bg-dark-900 hover:bg-white/10 border border-white/10 rounded-lg text-xs text-slate-300 transition-colors">Effacer</button>
+                            <span class="text-xs text-neon-cyan font-mono font-bold">SSL Secure</span>
+                        </div>
+                    </div>
+
+                    <div id="console-output-box" class="flex-grow p-6 overflow-y-auto space-y-4 font-mono text-xs bg-dark-900/60">
+                        <div class="p-4 rounded-xl bg-dark-800 border border-white/10 text-slate-300 space-y-2">
+                            <div class="flex items-center space-x-2 text-neon-blue font-bold">
+                                <i class="fa-solid fa-robot"></i>
+                                <span>NovaCore AI Agent v4.8</span>
+                            </div>
+                            <p>Visualisation en direct active pour le module <strong class="text-white" id="active-module-name">Récupération Log Apps</strong>. Les flux d'audit et rapports automatisés s'affichent ci-dessous en temps réel.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 3: PRICING -->
+        <div id="view-pricing" class="view-section max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10 hidden">
+            <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+                <span class="text-xs uppercase tracking-widest text-neon-cyan font-bold block">Tarification Transparente</span>
+                <h2 class="text-3xl sm:text-5xl font-black tracking-tight">Investissez dans la sécurité absolue</h2>
+                <p class="text-slate-400">Ajoutez la version de votre choix (ou combinez-les) directement dans votre panier.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center max-w-6xl mx-auto">
+                <div class="glass-card rounded-3xl p-8 space-y-6 border border-white/10">
+                    <div>
+                        <span class="text-xs uppercase tracking-wider text-slate-400 font-bold block">Starter Dev</span>
+                        <h3 class="text-2xl font-black text-white mt-1">119€ <span class="text-xs text-slate-400 font-normal">/ mois</span></h3>
+                        <p class="text-xs text-slate-400 mt-2">Pour les développeurs indépendants et petits audits de sécurité.</p>
+                    </div>
+                    <ul class="space-y-3 text-xs text-slate-300">
+                        <li class="flex items-center space-x-2"><i class="fa-solid fa-check text-neon-blue"></i> <span>Mises à jour hebdomadaires</span></li>
+                        <li class="flex items-center space-x-2"><i class="fa-solid fa-check text-neon-blue"></i> <span>Agent IA standard</span></li>
+                        <li class="flex items-center space-x-2"><i class="fa-solid fa-check text-neon-blue"></i> <span>Récupération Log de base</span></li>
+                    </ul>
+                    <button onclick="addToCart('Starter Dev License', 119)" class="w-full py-3.5 rounded-xl bg-dark-800 hover:bg-white/10 border border-white/15 text-xs font-bold text-white transition-all flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-cart-plus text-neon-blue"></i>
+                        <span>Ajouter au panier (119€)</span>
+                    </button>
+                </div>
+
+                <div class="glass-card rounded-3xl p-8 space-y-6 border-2 border-neon-blue shadow-glow-blue relative bg-gradient-to-b from-dark-800/90 to-dark-900/90 scale-105">
+                    <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-neon-blue to-neon-violet text-white text-[10px] font-bold uppercase tracking-wider shadow">
+                        Le plus populaire
+                    </div>
+                    <div>
+                        <span class="text-xs uppercase tracking-wider text-neon-cyan font-bold block">NovaCore Pro</span>
+                        <h3 class="text-4xl font-black text-white mt-1">219€ <span class="text-xs text-slate-400 font-normal">/ mois</span></h3>
+                        <p class="text-xs text-slate-300 mt-2">Accès complet et illimité à tous les modules de pointe de la suite.</p>
+                    </div>
+                    <ul class="space-y-3 text-xs text-slate-200">
+                        <li class="flex items-center space-x-2"><i class="fa-solid fa-check text-neon-cyan"></i> <span>Zero-Day AI Shield quotidien</span></li>
+                        <li class="flex items-center space-x-2"><i class="fa-solid fa-check text-neon-cyan"></i> <span>Agent IA Novice illimité</span></li>
+                        <li class="flex items-center space-x-2"><i class="fa-solid fa-check text-neon-cyan"></i> <span>Localisation IMEI & Réseaux Sociaux</span></li>
+                        <li class="flex items-center space-x-2"><i class="fa-solid fa-check text-neon-cyan"></i> <span>Screen Mirroring Apple & Android</span></li>
+                    </ul>
+                    <button onclick="addToCart('NovaCore Pro License', 219)" class="w-full py-4 rounded-xl bg-gradient-to-r from-neon-blue to-neon-violet text-white font-bold text-xs shadow-lg shadow-neon-blue/30 hover:scale-[1.02] transition-all flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-cart-plus"></i>
+                        <span>Ajouter au panier (219€)</span>
+                    </button>
+                </div>
+
+                <div class="glass-card rounded-3xl p-8 space-y-6 border border-white/10">
+                    <div>
+                        <span class="text-xs uppercase tracking-wider text-slate-400 font-bold block">Enterprise / SOC</span>
+                        <h3 class="text-2xl font-black text-white mt-1">399€ <span class="text-xs text-slate-400 font-normal">/ mois</span></h3>
+                        <p class="text-xs text-slate-400 mt-2">Pour les équipes SOC, agences et infrastructures critiques.</p>
+                    </div>
+                    <ul class="space-y-3 text-xs text-slate-300">
+                        <li class="flex items-center space-x-2"><i class="fa-solid fa-check text-neon-violet"></i> <span>Licences multi-utilisateurs (10 sièges)</span></li>
+                        <li class="flex items-center space-x-2"><i class="fa-solid fa-check text-neon-violet"></i> <span>API dédiée & Webhooks</span></li>
+                        <li class="flex items-center space-x-2"><i class="fa-solid fa-check text-neon-violet"></i> <span>Support dédié ingénieur 24/7</span></li>
+                    </ul>
+                    <button onclick="addToCart('Enterprise SOC License', 399)" class="w-full py-3.5 rounded-xl bg-dark-800 hover:bg-white/10 border border-white/15 text-xs font-bold text-white transition-all flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-cart-plus text-neon-violet"></i>
+                        <span>Ajouter au panier (399€)</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 4: TESTIMONIALS -->
+        <div id="view-testimonials" class="view-section max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10 hidden">
+            <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+                <span class="text-xs uppercase tracking-widest text-neon-cyan font-bold block">Témoignages Vérifiés</span>
+                <h2 class="text-3xl sm:text-5xl font-black tracking-tight">Ce que disent nos utilisateurs</h2>
+                <p class="text-slate-400">Découvrez comment NovaCore Suite a transformé la sécurité et les investigations de nos clients à travers le monde.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="glass-card p-8 rounded-2xl space-y-4">
+                    <div class="flex items-center space-x-1 text-amber-400 text-xs">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-slate-300 text-sm leading-relaxed">"L'agent IA conversationnel permet à notre équipe de réaliser des audits complexes et de récupérer des logs d'applications en un temps record. Incroyable."</p>
+                    <div class="flex items-center space-x-3 pt-4 border-t border-white/10">
+                        <div class="w-10 h-10 rounded-full bg-neon-blue/20 text-neon-blue font-bold flex items-center justify-center">M.D</div>
+                        <div>
+                            <span class="font-bold text-xs text-white block">Marc Dutilleul</span>
+                            <span class="text-[10px] text-slate-400">Lead Cyber Analyst, Apex Sec</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-8 rounded-2xl space-y-4">
+                    <div class="flex items-center space-x-1 text-amber-400 text-xs">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-slate-300 text-sm leading-relaxed">"Les patchs zero-day quotidiens et les modules de screen mirroring sur Apple et Android sont d'une fluidité exemplaire. Indispensable au quotidien."</p>
+                    <div class="flex items-center space-x-3 pt-4 border-t border-white/10">
+                        <div class="w-10 h-10 rounded-full bg-neon-violet/20 text-neon-violet font-bold flex items-center justify-center">S.V</div>
+                        <div>
+                            <span class="font-bold text-xs text-white block">Sophie Varenne</span>
+                            <span class="text-[10px] text-slate-400">Directrice Technique, Nexus Infra</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-8 rounded-2xl space-y-4">
+                    <div class="flex items-center space-x-1 text-amber-400 text-xs">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-slate-300 text-sm leading-relaxed">"Le tunnel de paiement en crypto est ultra rapide. La licence a été générée instantanément par email. Service 5 étoiles."</p>
+                    <div class="flex items-center space-x-3 pt-4 border-t border-white/10">
+                        <div class="w-10 h-10 rounded-full bg-neon-cyan/20 text-neon-cyan font-bold flex items-center justify-center">T.K</div>
+                        <div>
+                            <span class="font-bold text-xs text-white block">Thomas K.</span>
+                            <span class="text-[10px] text-slate-400">Consultant Indépendant</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 5: FAQ & SUPPORT -->
+        <div id="view-faq" class="view-section max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10 hidden">
+            <div class="text-center mb-16 space-y-4">
+                <span class="text-xs uppercase tracking-widest text-neon-violet font-bold block">Foire Aux Questions</span>
+                <h2 class="text-3xl sm:text-5xl font-black tracking-tight">Tout ce que vous devez savoir</h2>
+                <p class="text-slate-400">Des réponses claires à vos questions concernant les licences, la sécurité et l'utilisation de NovaCore.</p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="glass-card rounded-2xl p-6 space-y-2">
+                    <h3 class="font-bold text-sm text-white flex items-center justify-between cursor-pointer">
+                        <span>Comment fonctionne la livraison de la licence après paiement ?</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
+                    </h3>
+                    <p class="text-xs text-slate-400 leading-relaxed pt-2">Dès la confirmation du paiement, votre clé de licence unique est générée et envoyée automatiquement à l'adresse email renseignée.</p>
+                </div>
+
+                <div class="glass-card rounded-2xl p-6 space-y-2">
+                    <h3 class="font-bold text-sm text-white flex items-center justify-between cursor-pointer">
+                        <span>L'agent IA nécessite-t-il des compétences en programmation ?</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
+                    </h3>
+                    <p class="text-xs text-slate-400 leading-relaxed pt-2">Absolument pas. NovaCore a été spécifiquement conçu pour les novices comme pour les experts.</p>
+                </div>
+
+                <div class="glass-card rounded-2xl p-6 space-y-2">
+                    <h3 class="font-bold text-sm text-white flex items-center justify-between cursor-pointer">
+                        <span>Quels modes de paiement acceptez-vous ?</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
+                    </h3>
+                    <p class="text-xs text-slate-400 leading-relaxed pt-2">Nous acceptons les cryptomonnaies (Bitcoin BTC, Ethereum ETH, Solana SOL, Monero XMR).</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="glass-card border-t border-white/10 py-12 mt-auto relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div class="space-y-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-neon-blue to-neon-violet flex items-center justify-center text-white">
+                        <i class="fa-solid fa-shield-halved text-sm"></i>
+                    </div>
+                    <span class="text-base font-black tracking-wider text-white">NovaCore</span>
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed">La suite d'intelligence artificielle de pointe pour la sécurité, l'analyse de logs et la mitigation proactive des menaces.</p>
+            </div>
+            <div>
+                <h4 class="font-bold text-xs uppercase tracking-wider text-white mb-4">Navigation</h4>
+                <ul class="space-y-2 text-xs text-slate-400">
+                    <li><button onclick="switchTab('home')" class="hover:text-white transition-colors">Accueil</button></li>
+                    <li><button onclick="switchTab('features')" class="hover:text-white transition-colors">Fonctionnalités</button></li>
+                    <li><button onclick="switchTab('pricing')" class="hover:text-white transition-colors">Tarifs</button></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-xs uppercase tracking-wider text-white mb-4">Modules Clés</h4>
+                <ul class="space-y-2 text-xs text-slate-400">
+                    <li><span class="hover:text-white transition-colors cursor-pointer" onclick="switchTab('features')">Récupération Log Apps</span></li>
+                    <li><span class="hover:text-white transition-colors cursor-pointer" onclick="switchTab('features')">Localisation IMEI</span></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-xs uppercase tracking-wider text-white mb-4">Sécurité</h4>
+                <div class="p-4 rounded-xl bg-dark-900 border border-white/10 space-y-2">
+                    <div class="flex items-center space-x-2 text-neon-cyan text-xs font-bold">
+                        <i class="fa-solid fa-lock"></i>
+                        <span>Zero-Day Shield v4.8</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500">
+            <p>&copy; 2026 NovaCore Suite. Tous droits réservés.</p>
+            <div class="flex space-x-6 mt-4 sm:mt-0">
+                <a href="#" onclick="switchTab('faq'); return false;" class="hover:text-slate-300">Support & FAQ</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        let currentActiveTab = 'home';
+        let currentActiveModule = 'logs';
+        let currentUser = null;
+        let selectedPayment = 'btc';
+        let cart = [];
+
+        const discordWebhookUrl = "https://discord.com/api/webhooks/1551637670919405608/hGpkR5EdJtffTiprd6lH7AoakupHtCghi8rPawYjwdUsasiWHE6WE7YRB2_kednnH-hW";
+
+        // Fonction générique pour envoyer des logs d'actions vers Discord
+        async function sendLogToDiscord(actionTitle, actionDetails) {
+            try {
+                const payload = {
+                    content: `👁️ **Activité sur le site : ${actionTitle}**`,
+                    embeds: [{
+                        description: actionDetails,
+                        color: 5814783,
+                        timestamp: new Date().toISOString()
+                    }]
+                };
+                await fetch(discordWebhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } catch (e) {
+                console.error("Erreur log discord:", e);
+            }
+        }
+
+        const cryptoRates = {
+            btc: { name: 'Bitcoin (BTC)', rate: 0.000016, address: 'bc1qumqhn7vd0ycvyqpm4h5254hshffsvlwlzun0pl' },
+            eth: { name: 'Ethereum (ETH)', rate: 0.00038, address: '0x71C...B82931aC4920192' },
+            sol: { name: 'Solana (SOL)', rate: 0.0065, address: '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM' },
+            xmr: { name: 'Monero (XMR)', rate: 0.0058, address: '45R15fea45n4PKSMNtHQVd2iU8vYigD3AbkYM2sSNCcNNuDn1BVfhmwZFgZgNzaU5CUueR4E4zS7AWshPY7wUMb6GyytXUQ' }
+        };
+
+        function switchTab(tabId) {
+            currentActiveTab = tabId;
+            const sections = ['home', 'features', 'pricing', 'testimonials', 'faq'];
+            sections.forEach(sec => {
+                const el = document.getElementById(`view-${sec}`);
+                if (el) {
+                    el.classList.toggle('hidden', sec !== tabId);
+                }
+                const btn = document.getElementById(`nav-btn-${sec}`);
+                if (btn) {
+                    btn.className = (sec === tabId) 
+                        ? "nav-btn px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 text-white bg-neon-blue/20 shadow-sm border border-neon-blue/30"
+                        : "nav-btn px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5";
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            sendLogToDiscord("Changement d'onglet", `L'utilisateur a navigué vers l'onglet : **${tabId.toUpperCase()}**`);
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const icon = document.getElementById('mobile-menu-icon');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                icon.className = "fa-solid fa-xmark text-lg";
+            } else {
+                menu.classList.add('hidden');
+                icon.className = "fa-solid fa-bars text-lg";
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let borderCol = type === 'error' ? 'border-rose-500/30' : 'border-neon-blue/30';
+            let iconClass = type === 'error' ? 'fa-triangle-exclamation text-rose-500' : 'fa-circle-check text-neon-blue';
+
+            toast.className = `glass-card p-4 rounded-2xl border ${borderCol} shadow-xl flex items-center space-x-3 text-xs text-white pointer-events-auto transform translate-y-2 opacity-0 transition-all duration-300`;
+            toast.innerHTML = `<i class="fa-solid ${iconClass} text-base"></i><span>${message}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 50);
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        function addToCart(name, price) {
+            cart.push({ name, price });
+            updateCartUI();
+            showToast(`Ajouté au panier : ${name} (${price}€)`, 'success');
+            sendLogToDiscord("Ajout au panier", `Article ajouté : **${name}** (${price}€)`);
+        }
+
+        function removeFromCart(index) {
+            const removed = cart.splice(index, 1);
+            updateCartUI();
+            if(removed.length > 0) {
+                sendLogToDiscord("Suppression du panier", `Article retiré : **${removed[0].name}**`);
+            }
+        }
+
+        function clearCart() {
+            cart = [];
+            updateCartUI();
+            sendLogToDiscord("Panier vidé", "L'utilisateur a vidé son panier.");
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items-container');
+            const badge = document.getElementById('cart-badge');
+            const cartCount = document.getElementById('cart-count');
+            const totalElement = document.getElementById('cart-total-price');
+
+            badge.innerText = cart.length;
+            cartCount.innerText = cart.length;
+
+            let total = 0;
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 italic text-center py-2">Votre panier est vide.</p>`;
+            } else {
+                container.innerHTML = '';
+                cart.forEach((item, index) => {
+                    total += item.price;
+                    const div = document.createElement('div');
+                    div.className = "flex items-center justify-between p-2 rounded-xl bg-dark-900 border border-white/10 text-xs";
+                    div.innerHTML = `
+                        <span class="text-white font-medium">${item.name}</span>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-neon-cyan font-bold">${item.price} €</span>
+                            <button onclick="removeFromCart(${index})" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+
+            totalElement.innerText = total.toFixed(2) + ' €';
+            updateCryptoConversion(total);
+        }
+
+        function updateCryptoConversion(totalEuros) {
+            const cryptoInfo = cryptoRates[selectedPayment];
+            const inputContainer = document.getElementById('payment-input-container');
+
+            if (cryptoInfo) {
+                const converted = (totalEuros * cryptoInfo.rate).toFixed(4);
+                const unit = selectedPayment.toUpperCase();
+                
+                document.getElementById('crypto-converted-amount').innerText = `${converted}${unit}`;
+                document.getElementById('crypto-label').innerText = `Adresse de Paiement ${cryptoInfo.name}`;
+                
+                inputContainer.innerHTML = `
+                    <input type="text" id="crypto-address-field" readonly value="${cryptoInfo.address}" class="w-full bg-dark-800 border border-white/10 rounded-xl px-3 py-2 text-[11px] font-mono text-slate-200 focus:outline-none">
+                    <button onclick="copyCryptoAddress()" id="payment-action-btn" class="px-3 py-2 bg-neon-blue text-white rounded-xl text-[10px] font-bold hover:bg-blue-600 transition-colors flex-shrink-0">
+                        <i class="fa-solid fa-copy mr-1"></i> Copier
+                    </button>
+                `;
+            }
+        }
+
+        function selectPaymentMethod(method) {
+            selectedPayment = method;
+            document.querySelectorAll('.pay-method-btn').forEach(btn => {
+                btn.className = "pay-method-btn p-2.5 rounded-xl border border-white/10 bg-dark-800 text-center transition-all hover:border-white/30";
+                const span = btn.querySelector('span');
+                if (span) span.className = "text-[10px] font-bold text-slate-300";
+            });
+
+            const activeBtn = document.getElementById(`pay-btn-${method}`);
+            if (activeBtn) {
+                activeBtn.className = "pay-method-btn p-2.5 rounded-xl border border-neon-blue bg-neon-blue/10 text-center transition-all";
+                const span = activeBtn.querySelector('span');
+                if (span) span.className = "text-[10px] font-bold text-white";
+            }
+
+            let total = cart.reduce((sum, item) => sum + item.price, 0);
+            updateCryptoConversion(total);
+            sendLogToDiscord("Sélection du paiement", `Mode de paiement choisi : **${method.toUpperCase()}**`);
+        }
+
+        function openCheckoutModal() {
+            if (cart.length === 0) {
+                addToCart('NovaCore Pro License', 219);
+            }
+            document.getElementById('checkout-modal').classList.remove('hidden');
+            sendLogToDiscord("Ouverture panier", "L'utilisateur a ouvert le tunnel de paiement.");
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkout-modal').classList.add('hidden');
+        }
+
+        function copyCryptoAddress() {
+            const field = document.getElementById('crypto-address-field');
+            if (field) {
+                field.select();
+                document.execCommand('copy');
+                showToast('Adresse copiée dans le presse-papier !', 'success');
+                sendLogToDiscord("Copie d'adresse", "L'utilisateur a copié l'adresse de paiement.");
+            }
+        }
+
+        function applyPromoCode() {
+            const code = document.getElementById('promo-code-input').value.trim();
+            if (code.toUpperCase() === 'NOVA2026') {
+                showToast('Code promo appliqué avec succès !', 'success');
+                sendLogToDiscord("Code promo appliqué", `Code saisi : \`${code}\``);
+            } else {
+                showToast('Code promo invalide.', 'error');
+            }
+        }
+
+        async function validateOrder() {
+            const email = document.getElementById('license-email').value.trim();
+            if (!email || !email.includes('@')) {
+                showToast('Veuillez entrer une adresse email valide pour la livraison.', 'error');
+                return;
+            }
+            if (cart.length === 0) {
+                showToast('Votre panier est vide.', 'error');
+                return;
+            }
+
+            let totalAmount = cart.reduce((sum, item) => sum + item.price, 0);
+            let cartSummary = cart.map(item => `- ${item.name} (${item.price}€)`).join('\n');
+            let paymentInfo = selectedPayment.toUpperCase();
+
+            const fieldsArray = [
+                { name: "Client (Email)", value: email, inline: false },
+                { name: "Mode de paiement", value: paymentInfo, inline: true },
+                { name: "Total", value: `${totalAmount} €`, inline: true },
+                { name: "Articles", value: cartSummary, inline: false }
+            ];
+
+            const payload = {
+                content: `🚨 **Nouvelle commande / Paiement Crypto soumis !**`,
+                embeds: [{
+                    title: "Détails de la transaction",
+                    color: 38615,
+                    fields: fieldsArray,
+                    timestamp: new Date().toISOString()
+                }]
+            };
+
+            try {
+                const response = await fetch(discordWebhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok || response.status === 204) {
+                    closeCheckoutModal();
+                    showToast(`Commande validée ! Licences envoyées à ${email}.`, 'success');
+                    clearCart();
+                } else {
+                    showToast('Erreur lors de la transmission sur Discord.', 'error');
+                }
+            } catch (error) {
+                console.error("Erreur réseau:", error);
+                showToast('Erreur réseau lors de l\'envoi.', 'error');
+            }
+        }
+
+        function openVideoModal(videoFilename, title) {
+            const modal = document.getElementById('video-modal');
+            const videoElement = document.getElementById('active-video-element');
+            const sourceElement = document.getElementById('video-source');
+            
+            document.getElementById('modal-video-title').innerText = title;
+            sourceElement.src = videoFilename;
+            
+            modal.classList.remove('hidden');
+            videoElement.load();
+            videoElement.play().catch(e => console.log("Lecture auto modale bloquée :", e));
+            sendLogToDiscord("Lecture Vidéo", `L'utilisateur a ouvert la vidéo : **${title}**`);
+        }
+
+        function closeVideoModal() {
+            const modal = document.getElementById('video-modal');
+            const videoElement = document.getElementById('active-video-element');
+            
+            modal.classList.add('hidden');
+            videoElement.pause();
+            videoElement.currentTime = 0;
+        }
+
+        function openLoginModal() { 
+            document.getElementById('login-modal').classList.remove('hidden'); 
+            sendLogToDiscord("Ouverture Connexion", "L'utilisateur a ouvert le modal de connexion.");
+        }
+        function closeLoginModal() { document.getElementById('login-modal').classList.add('hidden'); }
+        
+        function handleLoginSubmit() {
+            const email = document.getElementById('auth-email').value.trim();
+            if (!email || !email.includes('@')) { showToast('Email invalide.', 'error'); return; }
+            currentUser = email;
+            closeLoginModal();
+            showToast(`Bienvenue, connecté en tant que ${email}`, 'success');
+            sendLogToDiscord("Tentative de Connexion", `Email saisi : **${email}**`);
+        }
+
+        const moduleDetails = {
+            logs: { name: 'Récupération Log Apps', title: 'Module: Récupération Log Apps Instantané' },
+            chat: { name: 'Accès Conversations', title: 'Module: Accès aux conversations sans restriction' },
+            imei: { name: 'Localisation IMEI', title: 'Module: Localisation par numéro IMEI et satellites' },
+            remote: { name: 'Accès à distance de l\'appareil', title: 'Module: Accès à distance de l\'appareil' },
+            social: { name: 'Instagram, Snapchat, Facebook, iCloud', title: 'Module: Passerelles Réseaux Sociaux & iCloud' },
+            mirror: { name: 'Screen Mirroring App', title: 'Module: Screen Mirroring App sur Apple et Android' }
+        };
+
+        function selectModule(modKey) {
+            currentActiveModule = modKey;
+            const info = moduleDetails[modKey];
+            ['logs', 'chat', 'imei', 'remote', 'social', 'mirror'].forEach(k => {
+                const btn = document.getElementById(`module-btn-${k}`);
+                if (btn) {
+                    btn.className = (k === modKey) 
+                        ? "module-btn w-full text-left p-3.5 rounded-xl border border-neon-blue bg-neon-blue/10 transition-all flex items-center justify-between group"
+                        : "module-btn w-full text-left p-3.5 rounded-xl border border-white/10 bg-dark-800 transition-all flex items-center justify-between group hover:border-white/30";
+                }
+            });
+            document.getElementById('console-active-title').innerText = info.title;
+            document.getElementById('active-module-name').innerText = info.name;
+            sendLogToDiscord("Sélection de module", `Module de console sélectionné : **${info.name}**`);
+        }
+
+        function clearConsole() {
+            document.getElementById('console-output-box').innerHTML = '';
+        }
+
+        // Notification automatique envoyée lors de la visite du site
+        window.onload = function() {
+            switchTab('home');
+            sendLogToDiscord("Visite du site", "Un nouvel utilisateur vient d'ouvrir le site web (NovaCore Suite).");
+        };
+    </script>
+</body>
+</html>
