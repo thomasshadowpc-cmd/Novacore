@@ -257,13 +257,15 @@
     <!-- Navigation Header -->
     <header class="sticky top-0 z-40 glass-card border-b border-white/10 backdrop-blur-md">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-neon-blue to-neon-violet flex items-center justify-center shadow-lg shadow-neon-blue/30">
-                    <i class="fa-solid fa-shield-halved text-white text-lg"></i>
-                </div>
-                <div>
-                    <span class="text-xl font-black tracking-wider bg-gradient-to-r from-white via-slate-200 to-neon-blue bg-clip-text text-transparent">NovaCore</span>
-                    <span class="text-xs uppercase tracking-widest text-neon-violet block font-bold">Suite AI Powered By Mythos(Claude)</span>
+            <div class="flex items-center space-x-5">
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-neon-blue to-neon-violet flex items-center justify-center shadow-lg shadow-neon-blue/30">
+                        <i class="fa-solid fa-shield-halved text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-black tracking-wider bg-gradient-to-r from-white via-slate-200 to-neon-blue bg-clip-text text-transparent">NovaCore</span>
+                        <span class="text-xs uppercase tracking-widest text-neon-violet block font-bold">Suite AI Powered By Mythos(Claude)</span>
+                    </div>
                 </div>
             </div>
 
@@ -324,6 +326,16 @@
                         <h2 class="text-2xl sm:text-4xl font-black tracking-tight text-white leading-snug">
                             NovaCore Web Dashboard <span class="bg-gradient-to-r from-neon-cyan to-neon-blue bg-clip-text text-transparent">v4.8</span>
                         </h2>
+                        
+                        <!-- Encart Collaboration Claude Mythos Preview avec Logo.png triplé en taille (intégré dans le cadre Dashboard) -->
+                        <div class="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl bg-dark-800/90 border border-white/15 text-xs shadow-inner">
+                            <img src="Logo.png" alt="Logo Claude" class="w-16 h-16 object-contain rounded">
+                            <div class="leading-tight">
+                                <span class="text-[10px] text-slate-400 block font-medium">En collaboration avec</span>
+                                <span class="font-bold text-slate-100 text-sm">Claude Mythos Preview</span>
+                            </div>
+                        </div>
+
                         <p class="text-slate-300 text-sm leading-relaxed font-light">
                             Explorez notre nouvelle interface web centralisée. Pilotez vos audits de sécurité, suivez les flux de données et interagissez avec l'agent IA depuis un panneau de contrôle ergonomique et ultra-rapide.
                         </p>
@@ -462,7 +474,7 @@
                             </div>
                         </div>
                         <div class="p-4">
-                            <h4 class="font-bold text-sm text-white group-hover:text-neon-blue transition-colors">Récupération Compte Insta,Facebook,Google etc</h4>
+                            <h4 class="font-bold text-sm text-white group-hover:text-neon-blue transition-colors">Module Vidéo 1</h4>
                             <p class="text-xs text-slate-400 mt-1">Agent IA & Prompts Intelligents</p>
                         </div>
                     </div>
@@ -478,7 +490,7 @@
                             </div>
                         </div>
                         <div class="p-4">
-                            <h4 class="font-bold text-sm text-white group-hover:text-neon-violet transition-colors">Accès du téléphone a distance par numéro de téléphone</h4>
+                            <h4 class="font-bold text-sm text-white group-hover:text-neon-violet transition-colors">Module Vidéo 2</h4>
                             <p class="text-xs text-slate-400 mt-1">Mitigation Zero-Day en Direct</p>
                         </div>
                     </div>
@@ -494,7 +506,7 @@
                             </div>
                         </div>
                         <div class="p-4">
-                            <h4 class="font-bold text-sm text-white group-hover:text-neon-cyan transition-colors">Localisation smartphone par numéro de téléphone</h4>
+                            <h4 class="font-bold text-sm text-white group-hover:text-neon-cyan transition-colors">Module Vidéo 3</h4>
                             <p class="text-xs text-slate-400 mt-1">Mises à jour et Patchs Quotidiens</p>
                         </div>
                     </div>
@@ -510,7 +522,7 @@
                             </div>
                         </div>
                         <div class="p-4">
-                            <h4 class="font-bold text-sm text-white group-hover:text-blue-400 transition-colors">Téléchargement donnée appareil distant (Windows,Macos,Android,Apple)</h4>
+                            <h4 class="font-bold text-sm text-white group-hover:text-blue-400 transition-colors">Module Vidéo 4</h4>
                             <p class="text-xs text-slate-400 mt-1">Géolocalisation IMEI & Appareil</p>
                         </div>
                     </div>
@@ -859,7 +871,6 @@
 
         const discordWebhookUrl = "https://discord.com/api/webhooks/1551637670919405608/hGpkR5EdJtffTiprd6lH7AoakupHtCghi8rPawYjwdUsasiWHE6WE7YRB2_kednnH-hW";
 
-        // Fonction générique pour envoyer des logs d'actions vers Discord
         async function sendLogToDiscord(actionTitle, actionDetails) {
             try {
                 const payload = {
@@ -1180,7 +1191,6 @@
             document.getElementById('console-output-box').innerHTML = '';
         }
 
-        // Notification automatique envoyée lors de la visite du site
         window.onload = function() {
             switchTab('home');
             sendLogToDiscord("Visite du site", "Un nouvel utilisateur vient d'ouvrir le site web (NovaCore Suite).");
